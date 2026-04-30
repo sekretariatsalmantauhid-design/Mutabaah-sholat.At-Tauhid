@@ -656,5 +656,22 @@
             });
         };
     </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Sistem Lite Terdaftar!'))
+                    .catch(err => console.log('Gagal daftar:', err));
+            });
+
+            // Trik Rahasia 3: Auto-Refresh layar kalau ada update dari sw.js
+            let refreshing;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                window.location.reload();
+                refreshing = true;
+            });
+        }
+    </script>
 </body>
 </html>
