@@ -1,7 +1,8 @@
 {
   "name": "Mutaba'ah Santri Pro",
   "short_name": "Mutabaah",
-  "start_url": "Mutabaah-sholat.At-Tauhid/",
+  "start_url": "/Mutabaah-sholat.At-Tauhid/",
+   "scope": "/Mutabaah-sholat.At-Tauhid/",
   "display": "standalone",
   "background_color": "#047857",
   "theme_color": "#047857",
