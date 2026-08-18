@@ -21,6 +21,12 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; border: 2px solid #f1f5f9; }
         ::-webkit-scrollbar-thumb:hover { background: #059669; }
+        
+        /* Custom Scrollbar Tipis untuk Kolom Catatan */
+        .scrollbar-thin::-webkit-scrollbar { width: 3px; height: 3px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
         .sticky-col { position: sticky; left: 0; z-index: 20; }
         .hukuman-row { transition: all 0.3s ease; }
         .hukuman-done { opacity: 0.4; background-color: #f8fafc; text-decoration: line-through; filter: grayscale(100%); }
@@ -29,8 +35,8 @@
         @media print {
             @page { size: landscape; margin: 5mm; }
             
-            /* JURUS SAKTI DARI BOS: RESET TOTAL ENGINE PDF ANDROID */
-            html, body, #main-app, main, section { 
+            /* RESET TOTAL ENGINE PDF ANDROID */
+            html, body, #main-app, main { 
                 display: block !important; 
                 margin: 0 !important; 
                 padding: 0 !important; 
@@ -41,24 +47,37 @@
                 position: static !important;
             }
             
-            /* Sembunyikan UI / Navigasi saat cetak */
-            nav, .print\:hidden, button, #action-buttons, .flex.space-x-2 { 
+            /* SECTION YANG AKTIF DIBIKIN BLOCK, YANG HIDDEN TETAP HIDDEN */
+            section:not(.hidden) {
+                display: block !important;
+            }
+            
+            /* Sembunyikan UI / Navigasi / Tab yang sembunyi saat cetak */
+            .hidden, section.hidden, .print\:hidden, nav, button, #action-buttons, .flex.space-x-2 { 
                 display: none !important; 
             }
             
-            /* Memaksa warna tabel ikut tercetak */
+            /* JURUS AGAR CATATAN MELEBAR KE BAWAH */
+            .overflow-y-auto, .overflow-auto, .max-h-[65vh], .max-h-[100px], .overflow-x-auto {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
             
-            .bg-white { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 10px !important; }
+            .bg-white { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 15px !important; background: transparent !important; }
+            .rounded-2xl, .rounded-xl { border-radius: 0 !important; }
             
-            /* Paksa tabel agar muat 1 halaman dan tidak terpotong */
-            table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #cbd5e1 !important; padding: 2px !important; word-wrap: break-word !important; white-space: normal !important; font-size: 8px !important; color: black !important; }
+            table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; border: 1px solid #cbd5e1 !important; }
+            
+            th { border: 1px solid #cbd5e1 !important; padding: 6px !important; font-size: 10px !important; background-color: #f8fafc !important; color: #334155 !important; word-wrap: break-word !important; white-space: normal !important; }
+            td { border: 1px solid #cbd5e1 !important; padding: 6px !important; font-size: 11px !important; color: #0f172a !important; word-wrap: break-word !important; white-space: normal !important; vertical-align: top; }
+            
             tr { page-break-inside: avoid !important; }
-            .page-break-avoid { page-break-inside: avoid !important; margin-bottom: 15px !important; }
+            .page-break-avoid { page-break-inside: avoid !important; margin-bottom: 25px !important; }
         }
     </style>
 </head>
@@ -125,7 +144,7 @@
                 </button>
             </div>
 
-            <!-- TAB PENGATURAN (BARU) -->
+            <!-- TAB PENGATURAN -->
             <section id="section-settings" class="hidden animate-fade-in print:hidden">
                 <div class="bg-white p-6 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-gray-100 mb-6">
                     <div class="flex items-center gap-4 mb-6 border-b pb-4">
@@ -362,13 +381,11 @@
         
         window.appSettings = { ...window.defaultSettings };
 
-        // --- DEKLARASI STATE (MEMORI LOKAL) ---
         window.students = [];
         window.db = {};
         window.dbPunishment = {};
         window.currentTab = 'input';
 
-        // --- FUNGSI GLOBAL (ALAT-ALAT UTAMA) ---
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toast-icon');
@@ -435,7 +452,6 @@
             if(tab === 'settings') window.renderSettings();
         }
 
-        // ================= SISTEM PENGATURAN (BARU) =================
         window.renderSettings = function() {
             document.getElementById('set-tahajjud').value = window.appSettings.targetTahajjud;
             document.getElementById('set-witir').value = window.appSettings.targetWitir;
@@ -481,28 +497,23 @@
             window.appSettings.targetWitir = parseInt(document.getElementById('set-witir').value) || 0;
             window.appSettings.targetRawatib = parseInt(document.getElementById('set-rawatib').value) || 0;
 
-            // Simpan ke Firebase (agar semua Ustadz dapat konfigurasi yang sama)
             set(ref(window.database, 'settings'), window.appSettings).then(() => {
                 window.showToast('Pengaturan Berhasil Disimpan!');
-                // Re-render UI yang mungkin terdampak
                 window.renderInputTable();
             });
         }
-
-        // ================= HELPER & RENDER TABEL =================
 
         window.getStatusBadge = function(code) {
             if(!code) return '-';
             const opt = window.appSettings.opsiFardhu.find(o => o.id === code);
             if(opt) {
                 const colorClass = opt.type === 'bad' ? 'text-red-600' : 'text-blue-600';
-                return `<span class="${colorClass} font-bold">${opt.label}</span>`;
+                return `<span class="${colorClass} font-bold">${opt.id}</span>`; // Disini kita pakai ID (singkatan)
             }
             return code;
         }
 
         window.createFardhuSelect = function(sId, prayer, val) {
-            // Default select pertama jika kosong
             const currentVal = val || (window.appSettings.opsiFardhu.length > 0 ? window.appSettings.opsiFardhu[0].id : '');
             
             let optsHtml = window.appSettings.opsiFardhu.map(opt => {
@@ -521,7 +532,6 @@
             return `<select id="${sId}_${prayer}" class="bg-emerald-50 border border-emerald-200 text-emerald-900 font-semibold text-xs rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 outline-none cursor-pointer hover:bg-emerald-100 transition-colors min-w-[70px]">${opts}</select>`;
         }
 
-        // --- FUNGSI MANIPULASI DATA SANTRI ---
         window.renderStudentsList = function() {
             const tbody = document.getElementById('students-tbody');
             if (window.students.length === 0) {
@@ -554,7 +564,6 @@
             const name = input.value.trim();
             if (!name) return;
             const newId = 'S' + Date.now().toString();
-            // Data baru selalu tercatat join_date dan status aktif
             const newArray = [...window.students, { id: newId, name: name, status: 'aktif', join_date: Date.now() }];
             set(ref(window.database, 'students'), newArray)
                 .then(() => { input.value = ''; window.showToast('Santri ditambahkan ke Cloud!'); })
@@ -604,12 +613,10 @@
             if (dayData.isLibur) { banner.classList.remove('hidden'); container.classList.add('hidden'); btns.classList.add('hidden'); return; } 
             else { banner.classList.add('hidden'); container.classList.remove('hidden'); btns.classList.remove('hidden'); }
 
-            // FILTER: Hanya memunculkan Santri yang Aktif untuk diabsen
             const activeStudents = window.students.filter(s => s.status !== 'nonaktif');
 
             if(activeStudents.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-500 italic">Belum ada daftar santri aktif di Database.</td></tr>`; theadTr.innerHTML=''; return; }
 
-            // ALL PRAYERS DINAMIS DENGAN RAWATIB
             const allPrayers = [
                 { id: 'subuh', label: 'Subuh', type: 'fardhu' },
                 { id: 'dzuhur', label: 'Dzuhur', type: 'fardhu' },
@@ -663,7 +670,6 @@
             const existingDayData = (window.db && window.db[date]) ? window.db[date] : {};
             const newDayData = {};
 
-            // Loop SEMUA siswa (termasuk yang arsip, supaya data lamanya yang mungkin ada hari ini nggak hilang ketimpa)
             window.students.forEach(s => {
                 newDayData[s.id] = existingDayData[s.id] ? { ...existingDayData[s.id] } : {};
                 
@@ -715,7 +721,7 @@
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
             const tableHeaderHTML = `
-                <thead class="text-[8px] text-gray-700 uppercase bg-gray-100 border-b border-gray-300 font-extrabold tracking-tight">
+                <thead class="text-[8px] text-gray-600 uppercase bg-slate-100 border-b border-slate-300 font-extrabold tracking-tight">
                     <tr>
                         <th class="px-2 py-2 w-[14%]" rowspan="2">Nama Santri</th>
                         <th class="px-1 py-2 text-center border-l w-[4%]" rowspan="2">% Fardhu</th>
@@ -737,7 +743,22 @@
                 const weekKeys = monthKeys.filter(date => { if(window.db && window.db[date] && window.db[date].isLibur) return false; const d = parseInt(date.split('-')[2]); return d >= w.s && d <= w.e; });
                 const totalDaysRecorded = weekKeys.length;
 
-                allHtml += `<div class="mb-10 page-break-avoid"><h3 class="text-base font-extrabold text-gray-800 mb-4 border-l-4 border-emerald-500 pl-3 flex items-center gap-2">${w.name} <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-lg">${w.desc}</span>${totalDaysRecorded === 0 ? '<span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold shadow-sm ml-2">DATA KOSONG / LIBUR</span>' : ''}</h3><div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-700">${tableHeaderHTML}<tbody>`;
+          // Buat legenda singkatan otomatis dari pengaturan opsi fardhu
+                let legendHtml = window.appSettings.opsiFardhu.map(o => `<span class="bg-gray-50 border border-gray-200 text-gray-600 px-1.5 py-0.5 rounded text-[9px] font-semibold"><b class="text-emerald-700">${o.id}</b> = ${o.label.split('(')[0].trim()}</span>`).join('');
+
+                allHtml += `<div class="mb-10 page-break-avoid">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-l-4 border-emerald-500 pl-3 gap-2">
+                        <h3 class="text-base font-extrabold text-gray-800 flex items-center gap-2">
+                            ${w.name} <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-lg">${w.desc}</span>
+                            ${totalDaysRecorded === 0 ? '<span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold shadow-sm ml-2">DATA KOSONG / LIBUR</span>' : ''}
+                        </h3>
+                        <!-- Keterangan Kepanjangan Singkatan (Legenda) -->
+                        <div class="flex flex-wrap gap-1 items-center">
+                            <span class="text-[9px] font-bold text-gray-400 mr-1 uppercase">Keterangan:</span>
+                            ${legendHtml}
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-700">${tableHeaderHTML}<tbody>`;
 
                 if(totalDaysRecorded === 0) {
                      allHtml += `<tr><td colspan="15" class="text-center py-8 text-gray-400 font-medium">Belum ada input data di pekan ini.</td></tr>`;
@@ -756,21 +777,21 @@
                                 ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].forEach(f => {
                                     const val = sData[f];
                                     
-                                    // Cek apakah diabsen (bukan kosong/undefined)
                                     if(val) {
-                                        // Cari data opsi dari Pengaturan
                                         const opt = window.appSettings.opsiFardhu.find(o => o.id === val);
-                                        // Jika opsi 'good' (Aman, seperti Jamaah, Uzur) maka hitung hadir
                                         if(opt && opt.type === 'good') { fTotal++; fHari[f]++; }
-                                        // Catat sbg anomali jika bukan opsi pertama (biasanya opsi pertama adalah 'J' Jamaah)
+                                        
+                                        // FORMAT CATATAN KOMPRES
                                         if(opt && opt.id !== window.appSettings.opsiFardhu[0].id) {
-                                            anomaly.push(`<span class="font-semibold text-gray-600">${sholatLabel[f]}:</span> ${window.getStatusBadge(val)}`);
+                                            const colorClass = opt.type === 'bad' ? 'text-red-600' : 'text-blue-600';
+                                            anomaly.push(`<span class="text-gray-500">${sholatLabel[f].substring(0,3)}:</span><span class="${colorClass} font-bold">${opt.id}</span>`);
                                         }
                                     }
                                 });
+                                
                                 if (anomaly.length > 0) {
                                     const dObj = new Date(date);
-                                    catatanLog.push(`<div class="mb-1.5"><span class="font-bold text-gray-800 text-[10px] mr-1">${namaHari[dObj.getDay()]}, ${dObj.getDate()}</span> ${anomaly.join(' <span class="text-gray-300">|</span> ')}</div>`);
+                                    catatanLog.push(`<div class="flex flex-wrap gap-1 items-center mb-1 pb-1 border-b border-gray-100 last:border-0"><span class="bg-gray-200 text-gray-700 px-1 rounded-[3px] text-[8px] font-bold">${namaHari[dObj.getDay()].substring(0,3)} ${dObj.getDate()}</span> ${anomaly.join('<span class="text-gray-300 mx-0.5">|</span>')}</div>`);
                                 }
                                 
                                 const thj = sData.tahajjud; if(thj === 'U'){ tHari++; } else { const r=parseInt(thj)||0; tRk+=r; if(r>=window.appSettings.targetTahajjud) tHari++; }
@@ -779,15 +800,12 @@
                             }
                         });
 
-                        // MESIN FILTER PINTAR:
-                        // Cek apakah pekan ini terjadi SEBELUM santri baru masuk pondok
                         let isBeforeJoined = false;
                         if (s.join_date && weekKeys.length > 0) {
                             const lastDayOfWeek = new Date(weekKeys[weekKeys.length-1]).getTime();
                             if (s.join_date > lastDayOfWeek) isBeforeJoined = true;
                         }
 
-                        // Jika dia Tidak Punya Data di pekan ini, DAN dia (Santri Nonaktif ATAU Santri yg Belum Masuk di pekan tsb) -> SKIP!
                         if (!hasDataThisWeek && (s.status === 'nonaktif' || isBeforeJoined)) {
                             return; 
                         }
@@ -799,8 +817,8 @@
                         const colorF = pctF < 70 ? 'text-red-600 bg-red-50' : 'text-emerald-700 bg-emerald-50/50';
                         const colorS = pctS < 50 ? 'text-red-600 bg-red-50' : 'text-blue-700 bg-blue-50/50';
                         const bgRow = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
-                        let renderCatatan = `<span class="text-gray-300 italic font-mono text-[11px]">- Bersih -</span>`;
-                        if (catatanLog.length > 0) renderCatatan = `<div class="max-h-[100px] overflow-y-auto text-[11px] pr-2">${catatanLog.join('')}</div>`;
+                        let renderCatatan = `<span class="text-gray-400 italic text-[9px]">- Bersih -</span>`;
+                        if (catatanLog.length > 0) renderCatatan = `<div class="text-[9px] pr-1">${catatanLog.join('')}</div>`;
 
                         allHtml += `<tr class="border-b border-gray-100 ${bgRow} hover:bg-emerald-50/50 transition-colors">
 <td class="px-2 py-2 font-bold text-[9px] ${s.status === 'nonaktif' ? 'text-gray-400 line-through' : 'text-gray-800'} whitespace-normal break-words">${s.name} ${s.status === 'nonaktif' ? '<span class="text-[7px] bg-red-50 text-red-500 px-1 rounded ml-1 font-bold">Arsip</span>' : ''}</td>
@@ -810,7 +828,7 @@
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.ashar}/${totalDaysRecorded}</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.maghrib}/${totalDaysRecorded}</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.isya}/${totalDaysRecorded}</td>
-<td class="px-2 py-2 border-l align-top bg-white leading-tight text-[8px]">${renderCatatan}</td>
+<td class="px-2 py-2 border-l align-top bg-white leading-tight">${renderCatatan}</td>
 <td class="px-1 py-2 text-center border-l font-extrabold text-[9px] ${colorS}">${pctS}%</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${tHari}/${totalDaysRecorded}</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${wHari}/${totalDaysRecorded}</td>
@@ -829,7 +847,7 @@
             });
             container.innerHTML = allHtml;
         }
-                  // Fungsi untuk Auto-Save Tab Hukuman ke Cloud
+
         window.savePunishment = function(id, field, value) {
             if (!window.dbPunishment[id]) window.dbPunishment[id] = {};
             window.dbPunishment[id][field] = value;
@@ -872,7 +890,6 @@
                     if(sData) {
                         let violations = [];
                         
-                        // Cek Pelanggaran Fardhu Dinamis berdasarkan Pengaturan
                         ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].forEach(f => {
                             const val = sData[f];
                             if(val) {
@@ -883,7 +900,6 @@
                             }
                         });
                         
-                        // Cek Pelanggaran Sunnah Dinamis
                         const thj = parseInt(sData.tahajjud)||0;
                         if(sData.tahajjud !== 'U' && thj < window.appSettings.targetTahajjud) violations.push(`<li><span class="font-bold text-blue-800">Tahajjud:</span> <span class="text-blue-600 font-bold">Kurang Target (${thj} Rakaat)</span></li>`);
                         
@@ -903,10 +919,10 @@
                             dayHtml += `
                                 <tr id="row-${pid}" class="border-b border-red-100 ${bgClass} hover:bg-red-50/50 hukuman-row ${pData.done ? 'hukuman-done' : ''}">
                                     <td class="px-2 py-2 font-bold text-gray-900 text-[9px] sticky-col bg-white whitespace-normal break-words shadow-[3px_0_10px_-3px_rgba(0,0,0,0.05)]">${s.name} ${s.status === 'nonaktif' ? '<span class="text-[7px] bg-red-50 text-red-500 px-1 rounded ml-1 font-bold">Arsip</span>' : ''}</td>
-                                    <td class="px-2 py-2 border-l border-red-100 text-[8px] align-top leading-tight"><ul class="list-none space-y-1">${violations.join('')}</ul></td>
-                                    <td class="px-2 py-2 border-l border-red-100 align-top"><textarea placeholder="Tulis hukuman..." onchange="window.savePunishment('${pid}', 'note', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 text-[8px] rounded block w-full p-1.5 focus:ring-2 focus:ring-red-500 focus:bg-white min-h-[50px] resize-none outline-none transition-colors shadow-inner">${pData.note || ''}</textarea></td>
-                                    <td class="px-2 py-2 border-l border-red-100 align-top"><input type="text" value="${pData.by || ''}" placeholder="Nama Ustadz..." onchange="window.savePunishment('${pid}', 'by', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 text-[8px] font-semibold rounded block w-full p-1.5 focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-colors shadow-inner"></td>
-                                    <td class="px-2 py-2 text-center border-l border-red-100 align-middle print:hidden"><label class="cursor-pointer flex flex-col items-center justify-center gap-1"><input type="checkbox" ${pData.done ? 'checked' : ''} onchange="window.savePunishment('${pid}', 'done', this.checked)" class="w-5 h-5 text-emerald-500 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2 shadow-sm transition-transform active:scale-90 cursor-pointer"><span class="text-[7px] font-bold text-gray-400 uppercase tracking-widest mt-1">Selesai</span></label></td>
+                                    <td class="px-2 py-2 border-l border-red-100 align-top leading-tight"><ul class="list-none space-y-1">${violations.join('')}</ul></td>
+                                    <td class="px-2 py-2 border-l border-red-100 align-top"><textarea placeholder="Tulis hukuman..." onchange="window.savePunishment('${pid}', 'note', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 rounded block w-full p-1.5 focus:ring-2 focus:ring-red-500 focus:bg-white min-h-[50px] resize-none outline-none transition-colors shadow-inner">${pData.note || ''}</textarea></td>
+                                    <td class="px-2 py-2 border-l border-red-100 align-top"><input type="text" value="${pData.by || ''}" placeholder="Nama Ustadz..." onchange="window.savePunishment('${pid}', 'by', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 font-semibold rounded block w-full p-1.5 focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-colors shadow-inner"></td>
+                                    <td class="px-2 py-2 text-center border-l border-red-100 align-middle print:hidden"><label class="cursor-pointer flex flex-col items-center justify-center gap-1"><input type="checkbox" ${pData.done ? 'checked' : ''} onchange="window.savePunishment('${pid}', 'done', this.checked)" class="w-5 h-5 text-emerald-500 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2 shadow-sm transition-transform active:scale-90 cursor-pointer"><span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Selesai</span></label></td>
                                 </tr>
                             `;
                         }
@@ -919,12 +935,12 @@
                         <h3 class="text-base font-extrabold text-red-800 mb-4 border-l-4 border-red-500 pl-3 flex items-center gap-2"><i class="fa-regular fa-calendar-xmark text-red-500"></i> ${formatTgl}</h3>
                         <div class="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden">
                             <div class="overflow-x-auto">
-                                <table class="w-full text-[9px] text-left text-gray-700 table-fixed border-collapse">
-                                    <thead class="bg-red-50 text-[8px] uppercase text-red-800 font-extrabold tracking-tight border-b border-red-200">
+                                <table class="w-full text-xs text-left text-gray-700 table-fixed border-collapse">
+                                    <thead class="bg-red-50 uppercase text-red-800 font-extrabold tracking-tight border-b border-red-200">
                                         <tr>
-                                            <th class="px-2 py-2 w-[18%] sticky-col bg-red-50">Nama Santri</th>
-                                            <th class="px-2 py-2 border-l border-red-200 w-[27%]">Detail Pelanggaran</th>
-                                            <th class="px-2 py-2 border-l border-red-200 w-[35%]">Catatan Hukuman <span class="print:hidden text-[7px] font-normal text-red-500 ml-1">(Auto-save)</span></th>
+                                            <th class="px-2 py-2 w-[20%] sticky-col bg-red-50">Nama Santri</th>
+                                            <th class="px-2 py-2 border-l border-red-200 w-[30%]">Detail Pelanggaran</th>
+                                            <th class="px-2 py-2 border-l border-red-200 w-[35%]">Catatan Hukuman <span class="print:hidden text-[9px] font-normal text-red-500 ml-1">(Auto-save)</span></th>
                                             <th class="px-2 py-2 border-l border-red-200 w-[15%]">Penghukum</th>
                                             <th class="px-2 py-2 text-center border-l border-red-200 print:hidden w-[5%]">Aksi</th>
                                         </tr>
@@ -944,7 +960,6 @@
             }
         }
 
-        // ================= 2. KONFIGURASI FIREBASE =================
         const firebaseConfig = {
             apiKey: "AIzaSyD3ESB7yHHACwOGNbwZwULs14EPBP0sy6Q",
             authDomain: "mutabaah-sholatsantri.firebaseapp.com",
@@ -958,15 +973,10 @@
         const app = initializeApp(firebaseConfig);
         window.database = getDatabase(app);
 
-        // ================= 3. INISIALISASI LISTENER FIREBASE =================
-        
-        // Listener Khusus Pengaturan
         onValue(ref(window.database, 'settings'), (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Merge data firebase dengan default untuk menghindari crash jika ada key baru
                 window.appSettings = { ...window.defaultSettings, ...data };
-                // Validasi data array opsi fardhu jika rusak
                 if(!window.appSettings.opsiFardhu || window.appSettings.opsiFardhu.length === 0) {
                     window.appSettings.opsiFardhu = window.defaultSettings.opsiFardhu;
                 }
@@ -1010,7 +1020,6 @@
             if(window.currentTab === 'punishment') window.renderPunishmentTable();
         });
 
-        // ================= 4. GLOBAL EXECUTOR (ONLOAD) =================
         window.onload = function() {
             const todayDate = new Date().toISOString().split('T')[0];
             const currentMonth = todayDate.substring(0, 7);
@@ -1023,7 +1032,6 @@
                 document.getElementById('main-app').classList.remove('hidden');
             }
 
-            // Panggil sekali di awal untuk mancing render pertama
             window.renderInputTable();
 
             document.getElementById('pin-input').addEventListener("keypress", function(e) {
