@@ -25,20 +25,24 @@
         .hukuman-row { transition: all 0.3s ease; }
         .hukuman-done { opacity: 0.4; background-color: #f8fafc; text-decoration: line-through; filter: grayscale(100%); }
         select:focus, input:focus, textarea:focus { outline: none; ring: 2px solid #10b981; }
-
-        @media print {
-            @page { size: landscape; margin: 10mm; }
-            body { background-color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 10px; }
+        
+                @media print {
+            @page { size: landscape; margin: 5mm; } /* Margin kertas dibuat lebih tipis */
+            body { background-color: white !important; font-size: 8px !important; }
             .print\:hidden { display: none !important; }
-            .bg-white { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
+            .bg-white { box-shadow: none !important; border: none !important; padding: 0 !important; margin-bottom: 10px !important; }
             .overflow-x-auto { overflow-x: visible !important; }
             .sticky-col { position: static !important; box-shadow: none !important; border-right: 1px solid #e2e8f0; }
-            table { width: 100% !important; border-collapse: collapse; }
-            th, td { border: 1px solid #cbd5e1 !important; padding: 4px !important; }
+            
+            /* Paksa tabel agar muat 1 halaman */
+            table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse; }
+            th, td { border: 1px solid #cbd5e1 !important; padding: 2px !important; word-wrap: break-word; white-space: normal !important; }
             tr { page-break-inside: avoid; }
             main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            textarea, input[type="text"] { border: none !important; background: transparent !important; padding: 0 !important; resize: none !important; width: 100% !important; }
-            .page-break-avoid { page-break-inside: avoid; margin-bottom: 20px; }
+            .page-break-avoid { page-break-inside: avoid; margin-bottom: 15px; }
+            
+            /* Sembunyikan scrollbar di catatan saat print */
+            .overflow-y-auto { max-height: none !important; overflow: hidden !important; }
         }
     </style>
 </head>
@@ -108,7 +112,7 @@
                         <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i class="fa-solid fa-calendar-check text-xl"></i></div>
                         <div>
                             <h2 class="text-xl font-extrabold text-gray-800">Ceklis Ibadah Harian</h2>
-                            <p class="text-sm text-gray-500 font-medium">Data sinkron otomatis ke semua HP Ustadz.</p>
+                            <p class="text-sm text-gray-500 font-medium">Hanya memunculkan santri aktif.</p>
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -135,11 +139,10 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] overflow-hidden border border-gray-100" id="table-container">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-600">
+                    <div class="overflow-auto max-h-[65vh]">
+                            <table class="w-full text-sm text-left text-gray-600">
                             <thead class="bg-gray-50 text-[11px] uppercase text-gray-500 font-extrabold tracking-wider border-b border-gray-200">
-                                <tr id="input-thead-tr">
-                                    </tr>
+                                <tr id="input-thead-tr"></tr>
                             </thead>
                             <tbody id="input-tbody"></tbody>
                         </table>
@@ -161,8 +164,8 @@
                     <div class="flex items-center gap-4">
                         <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i class="fa-solid fa-chart-pie text-xl"></i></div>
                         <div>
-                            <h2 class="text-xl font-extrabold text-gray-800">Laporan Pekanan</h2>
-                            <p class="text-sm text-gray-500 font-medium">Rekap persentase disiplin & log pelanggaran.</p>
+                            <h2 class="text-xl font-extrabold text-gray-800">Laporan Pekanan Cerdas</h2>
+                            <p class="text-sm text-gray-500 font-medium">Santri yang Keluar/Baru Masuk difilter otomatis.</p>
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -193,6 +196,13 @@
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <select id="filter-punishment-week" onchange="window.renderPunishmentTable()" class="bg-gray-50 border border-gray-200 text-red-900 rounded-xl p-3 shadow-inner font-bold text-sm focus:ring-2 focus:ring-red-500 cursor-pointer w-full sm:w-auto">
+                            <option value="all">Semua Pekan</option>
+                            <option value="0">Pekan 1 (Tgl 1 - 7)</option>
+                            <option value="1">Pekan 2 (Tgl 8 - 14)</option>
+                            <option value="2">Pekan 3 (Tgl 15 - 21)</option>
+                            <option value="3">Pekan 4 (Akhir Bulan)</option>
+                        </select>
                         <input type="month" id="punishment-month" class="bg-gray-50 border border-gray-200 rounded-xl p-3 shadow-inner font-bold text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 cursor-pointer w-full sm:w-auto" onchange="window.renderPunishmentTable()">
                         <button onclick="window.print()" class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-xl shadow-md text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95">
                             <i class="fa-solid fa-file-pdf"></i> Export PDF
@@ -211,7 +221,7 @@
                     <div class="bg-gray-100 text-gray-600 p-3 rounded-xl"><i class="fa-solid fa-users-gear text-xl"></i></div>
                     <div>
                         <h2 class="text-xl font-extrabold text-gray-800">Master Data Santri</h2>
-                        <p class="text-sm text-gray-500 font-medium">Tambah, edit, atau hapus nama santri (tersinkronisasi untuk semua Ustadz).</p>
+                        <p class="text-sm text-gray-500 font-medium">Gunakan tombol <b>Arsip <i class="fa-solid fa-box-archive"></i></b> untuk santri yang keluar/lulus agar data lamanya tidak hilang.</p>
                     </div>
                 </div>
 
@@ -231,7 +241,7 @@
                             <tr>
                                 <th class="px-6 py-4 w-16 text-center">No</th>
                                 <th class="px-6 py-4 w-full">Nama Lengkap</th>
-                                <th class="px-6 py-4 text-center min-w-[120px]">Aksi</th>
+                                <th class="px-6 py-4 text-center min-w-[140px]">Tindakan</th>
                             </tr>
                         </thead>
                         <tbody id="students-tbody"></tbody>
@@ -246,27 +256,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        // Konfigurasi Database Firebase (Sesuai dengan project Bos)
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3ESB7yHHACwOGNbwZwULs14EPBP0sy6Q",
-            authDomain: "mutabaah-sholatsantri.firebaseapp.com",
-            databaseURL: "https://mutabaah-sholatsantri-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "mutabaah-sholatsantri",
-            storageBucket: "mutabaah-sholatsantri.firebasestorage.app",
-            messagingSenderId: "701589398693",
-            appId: "1:701589398693:web:d16dfad379dc54497c594c"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        window.database = getDatabase(app);
-
-        // --- GLOBAL STATE ---
+        // --- DEKLARASI STATE (MEMORI LOKAL) ---
         window.students = [];
         window.db = {};
         window.dbPunishment = {};
         window.currentTab = 'input';
 
-        // --- FUNGSI GLOBAL (HOISTING AMAN) ---
+        // --- FUNGSI GLOBAL (ALAT-ALAT UTAMA) ---
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toast-icon');
@@ -319,10 +315,7 @@
             });
             if(tab === 'input') window.renderInputTable();
             if(tab === 'report') window.renderReportTable();
-            if(tab === 'punishment') {
-                document.getElementById('punishment-month').value = document.getElementById('report-month').value;
-                window.renderPunishmentTable();
-            }
+            if(tab === 'punishment') window.renderPunishmentTable();
             if(tab === 'students') window.renderStudentsList();
         }
 
@@ -354,7 +347,7 @@
             return `<select id="${sId}_${prayer}" class="bg-emerald-50 border border-emerald-200 text-emerald-900 font-semibold text-xs rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 outline-none cursor-pointer hover:bg-emerald-100 transition-colors min-w-[100px]">${opts}</select>`;
         }
 
-        // --- MANIPULASI DATA ---
+        // --- FUNGSI MANIPULASI DATA ---
         window.renderStudentsList = function() {
             const tbody = document.getElementById('students-tbody');
             if (window.students.length === 0) {
@@ -363,12 +356,18 @@
             tbody.innerHTML = window.students.map((s, idx) => `
                 <tr class="border-b bg-white hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 font-mono text-gray-400 font-medium text-center">${idx + 1}</td>
-                    <td class="px-6 py-4 font-bold text-gray-800">${s.name}</td>
-                    <td class="px-6 py-4 text-center flex justify-center gap-2">
-                        <button onclick="window.editStudent('${s.id}', '${s.name}')" class="text-blue-500 hover:text-white hover:bg-blue-500 bg-blue-50 w-10 h-10 rounded-xl transition-all flex items-center justify-center">
-                            <i class="fa-solid fa-pen-to-square"></i>
+                    <td class="px-6 py-4 font-bold ${s.status === 'nonaktif' ? 'text-gray-400 line-through' : 'text-gray-800'}">
+                        ${s.name} 
+                        ${s.status === 'nonaktif' ? '<span class="text-[9px] bg-red-50 text-red-500 px-2 py-1 rounded ml-2 font-bold uppercase tracking-wider">Arsip / Keluar</span>' : ''}
+                    </td>
+                    <td class="px-4 py-4 text-center flex justify-center gap-1.5">
+                        <button onclick="window.editStudent('${s.id}', '${s.name}')" title="Ganti Nama" class="text-blue-500 hover:text-white hover:bg-blue-500 bg-blue-50 w-9 h-9 rounded-xl transition-all flex items-center justify-center">
+                            <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button onclick="window.deleteStudent('${s.id}')" class="text-red-500 hover:text-white hover:bg-red-500 bg-red-50 w-10 h-10 rounded-xl transition-all flex items-center justify-center">
+                        <button onclick="window.archiveStudent('${s.id}')" title="${s.status === 'nonaktif' ? 'Aktifkan Kembali' : 'Santri Lulus/Keluar (Arsipkan)'}" class="${s.status === 'nonaktif' ? 'text-emerald-500 bg-emerald-50 hover:bg-emerald-500' : 'text-amber-600 bg-amber-50 hover:bg-amber-500'} hover:text-white w-9 h-9 rounded-xl transition-all flex items-center justify-center">
+                            <i class="fa-solid ${s.status === 'nonaktif' ? 'fa-rotate-left' : 'fa-box-archive'}"></i>
+                        </button>
+                        <button onclick="window.deleteStudent('${s.id}')" title="Hapus Permanen (AWAS DATANYA HILANG)" class="text-red-400 hover:text-white hover:bg-red-500 bg-red-50 w-9 h-9 rounded-xl transition-all flex items-center justify-center">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -381,7 +380,8 @@
             const name = input.value.trim();
             if (!name) return;
             const newId = 'S' + Date.now().toString();
-            const newArray = [...window.students, { id: newId, name: name }];
+            // Data baru selalu tercatat join_date dan status aktif
+            const newArray = [...window.students, { id: newId, name: name, status: 'aktif', join_date: Date.now() }];
             set(ref(window.database, 'students'), newArray)
                 .then(() => { input.value = ''; window.showToast('Santri ditambahkan ke Cloud!'); })
                 .catch((error) => window.showToast('Error: ' + error.message, 'error'));
@@ -391,40 +391,51 @@
             const newName = prompt("Edit Nama Santri:", currentName);
             if(newName && newName.trim() !== "" && newName.trim() !== currentName) {
                 const updatedArray = window.students.map(s => s.id === id ? { ...s, name: newName.trim() } : s);
-                set(ref(window.database, 'students'), updatedArray)
-                    .then(() => window.showToast('Nama Santri berhasil diperbarui!'))
-                    .catch((err) => window.showToast('Gagal update: ' + err.message, 'error'));
+                set(ref(window.database, 'students'), updatedArray).then(() => window.showToast('Nama Santri berhasil diperbarui!'));
             }
         }
 
+        // SISTEM SOFT DELETE (ARSIP)
+        window.archiveStudent = function(id) {
+            const student = window.students.find(s => s.id === id);
+            const isCurrentlyActive = (student.status !== 'nonaktif');
+            const confirmMsg = isCurrentlyActive 
+                ? "Apakah santri ini LULUS / KELUAR?\n\nKlik OK untuk mengarsipkan. Namanya akan hilang dari absen harian, tapi Laporan data lamanya tetap utuh." 
+                : "Aktifkan kembali santri ini ke daftar absen harian?";
+            
+            if(confirm(confirmMsg)) {
+                const newStatus = isCurrentlyActive ? 'nonaktif' : 'aktif';
+                const updatedArray = window.students.map(s => s.id === id ? { ...s, status: newStatus } : s);
+                set(ref(window.database, 'students'), updatedArray).then(() => window.showToast('Status Santri Berhasil Diubah!'));
+            }
+        }
+
+        // SISTEM HARD DELETE (HAPUS PERMANEN)
         window.deleteStudent = function(id) {
-            if(confirm('Yakin ingin menghapus santri dari Cloud?')) {
+            if(confirm('BAHAYA: Yakin ingin HAPUS PERMANEN?\n\nData laporan bulan lalu milik anak ini akan ikut terhapus dan rusak. \n\n(Disarankan pakai tombol kuning "Arsip" saja jika anak ini keluar/lulus)')) {
                 const filteredArray = window.students.filter(s => s.id !== id);
-                window.students = filteredArray;
-                window.renderStudentsList();
-                set(ref(window.database, 'students'), filteredArray)
-                    .then(() => window.showToast('Santri permanen dihapus dari Cloud.'))
-                    .catch((err) => { window.showToast('Gagal menghapus: ' + err.message, 'error'); location.reload(); });
+                set(ref(window.database, 'students'), filteredArray).then(() => window.showToast('Santri permanen dihapus dari Cloud.'));
             }
         }
 
         window.renderInputTable = function() {
             const dateEl = document.getElementById('input-date');
-            if(!dateEl) return;
+            if(!dateEl || !dateEl.value) return;
             const date = dateEl.value;
             const prayerFilter = document.getElementById('filter-prayer').value;
             const theadTr = document.getElementById('input-thead-tr');
             const tbody = document.getElementById('input-tbody');
             
-            // Pengaman dari error Undefined
             const dayData = (window.db && window.db[date]) ? window.db[date] : {};
-            
             const banner = document.getElementById('libur-banner'), container = document.getElementById('table-container'), btns = document.getElementById('action-buttons');
 
             if (dayData.isLibur) { banner.classList.remove('hidden'); container.classList.add('hidden'); btns.classList.add('hidden'); return; } 
             else { banner.classList.add('hidden'); container.classList.remove('hidden'); btns.classList.remove('hidden'); }
 
-            if(window.students.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-500 italic">Belum ada daftar santri di Database.</td></tr>`; theadTr.innerHTML=''; return; }
+            // FILTER: Hanya memunculkan Santri yang Aktif untuk diabsen
+            const activeStudents = window.students.filter(s => s.status !== 'nonaktif');
+
+            if(activeStudents.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-500 italic">Belum ada daftar santri aktif di Database.</td></tr>`; theadTr.innerHTML=''; return; }
 
             const allPrayers = [
                 { id: 'subuh', label: 'Subuh', type: 'fardhu' },
@@ -443,15 +454,18 @@
                 activePrayers = allPrayers.filter(p => p.type === 'sunnah');
             }
 
-            let headerHtml = `<th class="px-5 py-4 sticky-col bg-gray-50 min-w-[140px]">Nama Lengkap</th>`;
+                        // Z-40 untuk pojok kiri atas, Z-30 untuk baris atas
+            let headerHtml = `<th class="px-5 py-4 sticky-col bg-gray-50 min-w-[140px] sticky top-0 z-40 shadow-sm border-b border-gray-200">Nama Lengkap</th>`;
             activePrayers.forEach(p => {
-                headerHtml += `<th class="px-3 py-4 text-center min-w-[110px] ${p.bg || 'border-l border-gray-200'}">${p.label}</th>`;
+                // Hapus efek transparan (/50) agar teks di bawahnya tertutup sempurna saat di-scroll
+                const bgSolid = (p.bg || 'border-l border-gray-200 bg-gray-50').replace('/50', ''); 
+                headerHtml += `<th class="px-3 py-4 text-center min-w-[110px] ${bgSolid} sticky top-0 z-30 shadow-sm border-b border-gray-200">${p.label}</th>`;
             });
+
             theadTr.innerHTML = headerHtml;
 
-            tbody.innerHTML = window.students.map((s, idx) => {
+            tbody.innerHTML = activeStudents.map((s, idx) => {
                 const bg = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
-                // Pengaman Object
                 const d = dayData[s.id] || {};
                 
                 let rowHtml = `<tr class="border-b ${bg} hover:bg-emerald-100/50 transition-colors">
@@ -477,6 +491,7 @@
             const existingDayData = (window.db && window.db[date]) ? window.db[date] : {};
             const newDayData = {};
 
+            // Loop SEMUA siswa (termasuk yang arsip, supaya data lamanya yang mungkin ada hari ini nggak hilang ketimpa)
             window.students.forEach(s => {
                 newDayData[s.id] = existingDayData[s.id] ? { ...existingDayData[s.id] } : {};
                 
@@ -488,27 +503,25 @@
                 });
             });
             
-            set(ref(window.database, 'mutabaah/' + date), newDayData)
-                .then(() => window.showToast('Data Harian Sinkron di Cloud!'));
+            set(ref(window.database, 'mutabaah/' + date), newDayData).then(() => window.showToast('Data Harian Sinkron di Cloud!'));
         }
 
         window.setLibur = function() {
             const date = document.getElementById('input-date').value;
             if (!date) return;
             if(confirm('Aktifkan Mode Libur untuk tanggal ini?')) {
-                set(ref(window.database, 'mutabaah/' + date), { isLibur: true });
-                window.showToast('Mode Libur Aktif di Cloud!');
+                set(ref(window.database, 'mutabaah/' + date), { isLibur: true }).then(() => window.showToast('Mode Libur Aktif di Cloud!'));
             }
         }
         
         window.batalLibur = function() {
             const date = document.getElementById('input-date').value;
-            set(ref(window.database, 'mutabaah/' + date), null); 
-            window.showToast('Mode Libur dibatalkan!');
+            set(ref(window.database, 'mutabaah/' + date), null).then(() => window.showToast('Mode Libur dibatalkan!'));
         }
 
         window.renderReportTable = function() {
             const monthStr = document.getElementById('report-month').value; 
+            if(!monthStr) return;
             const weekFilter = document.getElementById('filter-week').value;
             const container = document.getElementById('report-container');
             container.innerHTML = ''; 
@@ -530,19 +543,19 @@
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
             const tableHeaderHTML = `
-                <thead class="text-[10px] text-gray-500 uppercase bg-gray-50 border-b border-gray-200 font-extrabold tracking-wider">
+                <thead class="text-[8px] text-gray-700 uppercase bg-gray-100 border-b border-gray-300 font-extrabold tracking-tight">
                     <tr>
-                        <th class="px-5 py-3 min-w-[150px] sticky-col bg-gray-50" rowspan="2">Nama Santri</th>
-                        <th class="px-2 py-3 text-center border-l bg-emerald-50/50 text-emerald-800" rowspan="2">Disiplin<br>Fardhu</th>
-                        <th class="px-2 py-2 text-center border-l border-b" colspan="5">Kehadiran Fardhu (Jamaah, Telat Adzan, Masbuq)</th>
-                        <th class="px-4 py-3 text-left border-l bg-red-50/30 text-red-800" rowspan="2">Catatan Pelanggaran Fardhu<br><span class="text-[8px] font-medium text-gray-500 normal-case">(Telat Adzan, Masbuq, Uzur, Sakit)</span></th>
-                        <th class="px-2 py-3 text-center border-l bg-blue-50/50 text-blue-800" rowspan="2">Disiplin<br>Sunnah</th>
-                        <th class="px-2 py-2 text-center border-l border-b" colspan="2">Target Sunnah Hari</th>
-                        <th class="px-2 py-2 text-center border-l border-b" colspan="2">Rakaat Sunnah</th>
+                        <th class="px-2 py-2 w-[15%]" rowspan="2">Nama Santri</th>
+                        <th class="px-1 py-2 text-center border-l w-[5%]" rowspan="2">% Fardhu</th>
+                        <th class="px-1 py-1 text-center border-l border-b w-[25%]" colspan="5">Hadir Fardhu</th>
+                        <th class="px-2 py-2 text-left border-l w-[30%]" rowspan="2">Catatan Pelanggaran</th>
+                        <th class="px-1 py-2 text-center border-l w-[5%]" rowspan="2">% Sunnah</th>
+                        <th class="px-1 py-1 text-center border-l border-b w-[10%]" colspan="2">Target</th>
+                        <th class="px-1 py-1 text-center border-l border-b w-[10%]" colspan="2">Rakaat</th>
                     </tr>
                     <tr>
-                        <th class="px-1 py-1.5 text-center border-l">Subuh</th><th class="px-1 py-1.5 text-center border-l">Dzuhur</th><th class="px-1 py-1.5 text-center border-l">Ashar</th><th class="px-1 py-1.5 text-center border-l">Maghrib</th><th class="px-1 py-1.5 text-center border-l">Isya</th>
-                        <th class="px-1 py-1.5 text-center border-l">Tahajjud (≥4)</th><th class="px-1 py-1.5 text-center border-l">Witir (≥3)</th><th class="px-1 py-1.5 text-center border-l text-gray-400 font-medium">Tahajjud</th><th class="px-1 py-1.5 text-center border-l text-gray-400 font-medium">Witir</th>
+                        <th class="px-1 py-1 text-center border-l text-[7px]">S</th><th class="px-1 py-1 text-center border-l text-[7px]">D</th><th class="px-1 py-1 text-center border-l text-[7px]">A</th><th class="px-1 py-1 text-center border-l text-[7px]">M</th><th class="px-1 py-1 text-center border-l text-[7px]">I</th>
+                        <th class="px-1 py-1 text-center border-l text-[7px]">Thj</th><th class="px-1 py-1 text-center border-l text-[7px]">Wtr</th><th class="px-1 py-1 text-center border-l text-[7px]">Thj</th><th class="px-1 py-1 text-center border-l text-[7px]">Wtr</th>
                     </tr>
                 </thead>`;
 
@@ -556,13 +569,16 @@
                 if(totalDaysRecorded === 0) {
                      allHtml += `<tr><td colspan="13" class="text-center py-8 text-gray-400 font-medium">Belum ada input data di pekan ini.</td></tr>`;
                 } else {
+                    let hasRenderedAnyone = false;
                     window.students.forEach((s, idx) => {
                         let fTotal = 0, fHari = { subuh: 0, dzuhur: 0, ashar: 0, maghrib: 0, isya: 0 };
                         let tHari = 0, wHari = 0, tRk = 0, wRk = 0, catatanLog = []; 
+                        let hasDataThisWeek = false;
 
                         weekKeys.forEach(date => {
                             const sData = (window.db && window.db[date]) ? window.db[date][s.id] : undefined;
                             if(sData) {
+                                hasDataThisWeek = true;
                                 let anomaly = [];
                                 ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].forEach(f => {
                                     const val = sData[f];
@@ -578,6 +594,21 @@
                             }
                         });
 
+                        // MESIN FILTER PINTAR:
+                        // Cek apakah pekan ini terjadi SEBELUM santri baru masuk pondok
+                        let isBeforeJoined = false;
+                        if (s.join_date && weekKeys.length > 0) {
+                            const lastDayOfWeek = new Date(weekKeys[weekKeys.length-1]).getTime();
+                            if (s.join_date > lastDayOfWeek) isBeforeJoined = true;
+                        }
+
+                        // Jika dia Tidak Punya Data di pekan ini, DAN dia (Santri Nonaktif ATAU Santri yg Belum Masuk di pekan tsb) -> SKIP!
+                        if (!hasDataThisWeek && (s.status === 'nonaktif' || isBeforeJoined)) {
+                            return; 
+                        }
+
+                        hasRenderedAnyone = true;
+
                         const pctF = totalDaysRecorded === 0 ? 0 : Math.round((fTotal / (5*totalDaysRecorded)) * 100);
                         const pctS = totalDaysRecorded === 0 ? 0 : Math.round(((tHari+wHari) / (2*totalDaysRecorded)) * 100);
                         const colorF = pctF < 70 ? 'text-red-600 bg-red-50' : 'text-emerald-700 bg-emerald-50/50';
@@ -586,8 +617,26 @@
                         let renderCatatan = `<span class="text-gray-300 italic font-mono text-[11px]">- Bersih -</span>`;
                         if (catatanLog.length > 0) renderCatatan = `<div class="max-h-[100px] overflow-y-auto text-[11px] pr-2">${catatanLog.join('')}</div>`;
 
-                        allHtml += `<tr class="border-b border-gray-100 ${bgRow} hover:bg-emerald-50/50 transition-colors"><td class="px-5 py-4 font-bold text-gray-800 sticky-col ${bgRow} whitespace-nowrap shadow-[3px_0_10px_-3px_rgba(0,0,0,0.05)]">${s.name}</td><td class="px-2 py-4 text-center border-l font-extrabold text-sm ${colorF}">${pctF}%</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${fHari.subuh}/${totalDaysRecorded}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${fHari.dzuhur}/${totalDaysRecorded}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${fHari.ashar}/${totalDaysRecorded}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${fHari.maghrib}/${totalDaysRecorded}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${fHari.isya}/${totalDaysRecorded}</td><td class="px-4 py-3 border-l min-w-[280px] align-top bg-white">${renderCatatan}</td><td class="px-2 py-4 text-center border-l font-extrabold text-sm ${colorS}">${pctS}%</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${tHari}/${totalDaysRecorded}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-600">${wHari}/${totalDaysRecorded}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-400 font-bold">${tRk}</td><td class="px-2 py-3 text-center border-l font-mono text-[11px] text-gray-400 font-bold">${wRk}</td></tr>`;
+                        allHtml += `<tr class="border-b border-gray-100 ${bgRow} hover:bg-emerald-50/50 transition-colors">
+<td class="px-2 py-2 font-bold text-[9px] ${s.status === 'nonaktif' ? 'text-gray-400 line-through' : 'text-gray-800'} whitespace-normal break-words">${s.name} ${s.status === 'nonaktif' ? '<span class="text-[7px] bg-red-50 text-red-500 px-1 rounded ml-1 font-bold">Arsip</span>' : ''}</td>
+<td class="px-1 py-2 text-center border-l font-extrabold text-[9px] ${colorF}">${pctF}%</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.subuh}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.dzuhur}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.ashar}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.maghrib}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${fHari.isya}/${totalDaysRecorded}</td>
+<td class="px-2 py-2 border-l align-top bg-white leading-tight text-[8px]">${renderCatatan}</td>
+<td class="px-1 py-2 text-center border-l font-extrabold text-[9px] ${colorS}">${pctS}%</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${tHari}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${wHari}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-400 font-bold">${tRk}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-400 font-bold">${wRk}</td>
+</tr>`;
                     });
+
+                    if(!hasRenderedAnyone) {
+                         allHtml += `<tr><td colspan="13" class="text-center py-8 text-gray-400 font-medium">Tidak ada data santri yang relevan di pekan ini.</td></tr>`;
+                    }
                 }
                 allHtml += `</tbody></table></div></div></div>`;
             });
@@ -602,10 +651,22 @@
 
         window.renderPunishmentTable = function() {
             const monthStr = document.getElementById('punishment-month').value; 
+            if(!monthStr) return;
+            const weekFilter = document.getElementById('filter-punishment-week').value;
             const container = document.getElementById('punishment-container');
             container.innerHTML = '';
 
-            const monthKeys = (window.db ? Object.keys(window.db) : []).filter(d => d.startsWith(monthStr)).sort();
+            let monthKeys = (window.db ? Object.keys(window.db) : []).filter(d => d.startsWith(monthStr)).sort();
+            
+            if(weekFilter !== 'all') {
+                const allWeeks = [ { s: 1, e: 7 }, { s: 8, e: 14 }, { s: 15, e: 21 }, { s: 22, e: 31 } ];
+                const w = allWeeks[parseInt(weekFilter)];
+                monthKeys = monthKeys.filter(date => {
+                    const d = parseInt(date.split('-')[2]);
+                    return d >= w.s && d <= w.e;
+                });
+            }
+
             const sholatLabel = { subuh: 'Subuh', dzuhur: 'Dzuhur', ashar: 'Ashar', maghrib: 'Maghrib', isya: 'Isya' };
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -641,30 +702,63 @@
                             
                             dayHtml += `
                                 <tr id="row-${pid}" class="border-b border-red-100 ${bgClass} hover:bg-red-50/50 hukuman-row ${pData.done ? 'hukuman-done' : ''}">
-                                    <td class="px-5 py-4 font-bold text-gray-900 sticky-col bg-white whitespace-nowrap shadow-[3px_0_10px_-3px_rgba(0,0,0,0.05)]">${s.name}</td>
-                                    <td class="px-5 py-4 border-l border-red-100 text-sm align-top leading-relaxed"><ul class="list-none space-y-1.5">${violations.join('')}</ul></td>
-                                    <td class="px-3 py-3 border-l border-red-100 align-top"><textarea placeholder="Tulis hukuman..." onchange="window.savePunishment('${pid}', 'note', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 text-xs rounded-xl block w-full p-3 focus:ring-2 focus:ring-red-500 focus:bg-white min-h-[80px] resize-none outline-none transition-colors shadow-inner">${pData.note || ''}</textarea></td>
-                                    <td class="px-3 py-3 border-l border-red-100 align-top"><input type="text" value="${pData.by || ''}" placeholder="Nama Ustadz..." onchange="window.savePunishment('${pid}', 'by', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 text-xs font-semibold rounded-xl block w-full p-3 focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-colors shadow-inner"></td>
-                                    <td class="px-4 py-4 text-center border-l border-red-100 align-middle print:hidden"><label class="cursor-pointer flex flex-col items-center justify-center gap-1"><input type="checkbox" ${pData.done ? 'checked' : ''} onchange="window.savePunishment('${pid}', 'done', this.checked)" class="w-6 h-6 text-emerald-500 bg-gray-100 border-gray-300 rounded-lg focus:ring-emerald-500 focus:ring-2 shadow-sm transition-transform active:scale-90 cursor-pointer"><span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Selesai</span></label></td>
+                                    <td class="px-2 py-2 font-bold text-gray-900 text-[9px] sticky-col bg-white whitespace-normal break-words shadow-[3px_0_10px_-3px_rgba(0,0,0,0.05)]">${s.name} ${s.status === 'nonaktif' ? '<span class="text-[7px] bg-red-50 text-red-500 px-1 rounded ml-1 font-bold">Arsip</span>' : ''}</td>
+                                    <td class="px-2 py-2 border-l border-red-100 text-[8px] align-top leading-tight"><ul class="list-none space-y-1">${violations.join('')}</ul></td>
+                                    <td class="px-2 py-2 border-l border-red-100 align-top"><textarea placeholder="Tulis hukuman..." onchange="window.savePunishment('${pid}', 'note', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 text-[8px] rounded block w-full p-1.5 focus:ring-2 focus:ring-red-500 focus:bg-white min-h-[50px] resize-none outline-none transition-colors shadow-inner">${pData.note || ''}</textarea></td>
+                                    <td class="px-2 py-2 border-l border-red-100 align-top"><input type="text" value="${pData.by || ''}" placeholder="Nama Ustadz..." onchange="window.savePunishment('${pid}', 'by', this.value)" class="bg-red-50/30 border border-red-200 text-gray-900 text-[8px] font-semibold rounded block w-full p-1.5 focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-colors shadow-inner"></td>
+                                    <td class="px-2 py-2 text-center border-l border-red-100 align-middle print:hidden"><label class="cursor-pointer flex flex-col items-center justify-center gap-1"><input type="checkbox" ${pData.done ? 'checked' : ''} onchange="window.savePunishment('${pid}', 'done', this.checked)" class="w-5 h-5 text-emerald-500 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 focus:ring-2 shadow-sm transition-transform active:scale-90 cursor-pointer"><span class="text-[7px] font-bold text-gray-400 uppercase tracking-widest mt-1">Selesai</span></label></td>
                                 </tr>
                             `;
                         }
                     }
                 });
 
-                if (dayHasViolation) {
-                    allHtml += `<div class="mb-10 page-break-avoid"><h3 class="text-lg font-extrabold text-red-800 mb-4 border-l-4 border-red-500 pl-3 flex items-center gap-2"><i class="fa-regular fa-calendar-xmark text-red-500"></i> ${formatTgl}</h3><div class="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-700"><thead class="bg-red-50 text-[11px] uppercase text-red-800 font-extrabold tracking-wider border-b border-red-200"><tr><th class="px-5 py-4 min-w-[150px] sticky-col bg-red-50">Nama Santri</th><th class="px-5 py-4 border-l border-red-200 min-w-[240px]">Detail Pelanggaran</th><th class="px-4 py-4 border-l border-red-200 min-w-[220px]">Catatan Hukuman <span class="print:hidden text-[9px] font-normal text-red-500 ml-1">(Auto-save)</span></th><th class="px-4 py-4 border-l border-red-200 min-w-[140px]">Penghukum</th><th class="px-4 py-4 text-center border-l border-red-200 print:hidden w-[100px]">Aksi</th></tr></thead><tbody>${dayHtml}</tbody></table></div></div></div>`;
+                    if (dayHasViolation) {
+                    allHtml += `
+                    <div class="mb-10 page-break-avoid">
+                        <h3 class="text-base font-extrabold text-red-800 mb-4 border-l-4 border-red-500 pl-3 flex items-center gap-2"><i class="fa-regular fa-calendar-xmark text-red-500"></i> ${formatTgl}</h3>
+                        <div class="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-[9px] text-left text-gray-700 table-fixed border-collapse">
+                                    <thead class="bg-red-50 text-[8px] uppercase text-red-800 font-extrabold tracking-tight border-b border-red-200">
+                                        <tr>
+                                            <th class="px-2 py-2 w-[18%] sticky-col bg-red-50">Nama Santri</th>
+                                            <th class="px-2 py-2 border-l border-red-200 w-[27%]">Detail Pelanggaran</th>
+                                            <th class="px-2 py-2 border-l border-red-200 w-[35%]">Catatan Hukuman <span class="print:hidden text-[7px] font-normal text-red-500 ml-1">(Auto-save)</span></th>
+                                            <th class="px-2 py-2 border-l border-red-200 w-[15%]">Penghukum</th>
+                                            <th class="px-2 py-2 text-center border-l border-red-200 print:hidden w-[5%]">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${dayHtml}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`;
                 }
             });
 
             if (totalMonthlyViolations === 0) {
-                container.innerHTML = `<div class="bg-white p-12 rounded-3xl shadow-sm border border-emerald-100 text-center"><div class="bg-emerald-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-5 border border-emerald-100"><i class="fa-solid fa-face-smile-beam text-5xl text-emerald-500"></i></div><p class="font-extrabold text-2xl text-emerald-800 mb-2">Alhamdulillah!</p><p class="text-sm font-medium opacity-80 text-emerald-700">Tidak ada satupun catatan pelanggaran yang perlu ditindak di bulan ini.</p></div>`;
+                container.innerHTML = `<div class="bg-white p-12 rounded-3xl shadow-sm border border-emerald-100 text-center"><div class="bg-emerald-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-5 border border-emerald-100"><i class="fa-solid fa-face-smile-beam text-5xl text-emerald-500"></i></div><p class="font-extrabold text-2xl text-emerald-800 mb-2">Alhamdulillah!</p><p class="text-sm font-medium opacity-80 text-emerald-700">Tidak ada satupun catatan pelanggaran yang perlu ditindak di rentang waktu ini.</p></div>`;
             } else {
                 container.innerHTML = allHtml;
             }
         }
 
-        // ================= 2. INISIALISASI LISTENER FIREBASE =================
+        // ================= 2. KONFIGURASI FIREBASE =================
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3ESB7yHHACwOGNbwZwULs14EPBP0sy6Q",
+            authDomain: "mutabaah-sholatsantri.firebaseapp.com",
+            databaseURL: "https://mutabaah-sholatsantri-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mutabaah-sholatsantri",
+            storageBucket: "mutabaah-sholatsantri.firebasestorage.app",
+            messagingSenderId: "701589398693",
+            appId: "1:701589398693:web:d16dfad379dc54497c594c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.database = getDatabase(app);
+
+        // ================= 3. INISIALISASI LISTENER FIREBASE =================
         onValue(ref(window.database, 'students'), (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -680,6 +774,7 @@
             }
             if(window.currentTab === 'students') window.renderStudentsList();
             if(window.currentTab === 'input') window.renderInputTable();
+            if(window.currentTab === 'report') window.renderReportTable();
         });
 
         onValue(ref(window.database, 'mutabaah'), (snapshot) => {
@@ -694,7 +789,7 @@
             if(window.currentTab === 'punishment') window.renderPunishmentTable();
         });
 
-        // ================= 3. ONLOAD EXECUTOR =================
+        // ================= 4. GLOBAL EXECUTOR (ONLOAD) =================
         window.onload = function() {
             const todayDate = new Date().toISOString().split('T')[0];
             const currentMonth = todayDate.substring(0, 7);
@@ -707,6 +802,7 @@
                 document.getElementById('main-app').classList.remove('hidden');
             }
 
+            // Panggil sekali di awal untuk mancing render pertama
             window.renderInputTable();
 
             document.getElementById('pin-input').addEventListener("keypress", function(e) {
