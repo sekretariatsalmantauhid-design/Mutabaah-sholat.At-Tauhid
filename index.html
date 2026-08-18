@@ -31,7 +31,7 @@
             
             /* JURUS SAKTI DARI BOS: RESET TOTAL ENGINE PDF ANDROID */
             html, body, #main-app, main, section { 
-                display: block !important; /* Mematikan flexbox Tailwind yang bikin error */
+                display: block !important; 
                 margin: 0 !important; 
                 padding: 0 !important; 
                 background: white !important; 
@@ -120,8 +120,77 @@
                 <button onclick="window.switchTab('students')" id="tab-students" class="flex-1 min-w-[130px] px-4 py-2.5 rounded-xl text-gray-500 hover:bg-gray-50 font-semibold transition-all flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-users-gear"></i> Data Santri
                 </button>
+                <button onclick="window.switchTab('settings')" id="tab-settings" class="flex-1 min-w-[130px] px-4 py-2.5 rounded-xl text-gray-500 hover:bg-gray-50 font-semibold transition-all flex items-center justify-center gap-2 text-sm border border-transparent">
+                    <i class="fa-solid fa-gear"></i> Pengaturan
+                </button>
             </div>
 
+            <!-- TAB PENGATURAN (BARU) -->
+            <section id="section-settings" class="hidden animate-fade-in print:hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-gray-100 mb-6">
+                    <div class="flex items-center gap-4 mb-6 border-b pb-4">
+                        <div class="bg-gray-100 text-gray-600 p-3 rounded-xl"><i class="fa-solid fa-sliders text-xl"></i></div>
+                        <div>
+                            <h2 class="text-xl font-extrabold text-gray-800">Pengaturan Sistem Mutaba'ah</h2>
+                            <p class="text-sm text-gray-500 font-medium">Ubah target rakaat sunnah dan opsi alasan absen di sini.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Pengaturan Target Sunnah -->
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-inner">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-bullseye text-blue-500"></i> Target Minimal Sunnah (Rakaat)</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                    <label class="text-sm font-bold text-gray-700">Tahajjud</label>
+                                    <input type="number" id="set-tahajjud" class="w-20 p-2 bg-gray-50 border border-gray-200 rounded-lg text-center font-bold text-emerald-700" min="0" max="20">
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                    <label class="text-sm font-bold text-gray-700">Witir</label>
+                                    <input type="number" id="set-witir" class="w-20 p-2 bg-gray-50 border border-gray-200 rounded-lg text-center font-bold text-emerald-700" min="0" max="20">
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                    <label class="text-sm font-bold text-gray-700">Rawatib</label>
+                                    <input type="number" id="set-rawatib" class="w-20 p-2 bg-gray-50 border border-gray-200 rounded-lg text-center font-bold text-emerald-700" min="0" max="12">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pengaturan Opsi Keterangan Absen -->
+                        <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-inner">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-list-check text-emerald-500"></i> Opsi Keterangan Absen Fardhu</h3>
+                            
+                            <!-- List Opsi -->
+                            <div id="settings-options-list" class="space-y-2 mb-5 max-h-48 overflow-y-auto pr-2">
+                                <!-- JS Injects Here -->
+                            </div>
+                            
+                            <!-- Form Tambah Opsi -->
+                            <div class="border-t border-gray-200 pt-4 mt-2">
+                                <p class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tambah Opsi Baru</p>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" id="new-opt-id" placeholder="Kode (ex: I)" class="w-1/4 p-2 bg-white border border-gray-200 rounded-lg text-xs font-bold uppercase">
+                                    <input type="text" id="new-opt-label" placeholder="Nama Label (ex: Izin Pulang)" class="w-2/4 p-2 bg-white border border-gray-200 rounded-lg text-xs">
+                                    <select id="new-opt-type" class="w-1/4 p-2 bg-white border border-gray-200 rounded-lg text-xs font-bold">
+                                        <option value="good">Aman</option>
+                                        <option value="bad">Hukuman</option>
+                                    </select>
+                                </div>
+                                <button onclick="window.addFardhuOption()" class="w-full bg-gray-800 text-white font-bold py-2.5 rounded-lg text-sm hover:bg-gray-900 transition-all shadow-md active:scale-95"><i class="fa-solid fa-plus mr-1"></i> Tambah Opsi</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="window.saveSettings()" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold py-3 px-10 rounded-xl hover:from-emerald-700 hover:to-teal-600 transition-all shadow-[0_8px_15px_-3px_rgba(16,185,129,0.4)] active:scale-95 text-lg">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Pengaturan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB INPUT HARIAN -->
             <section id="section-input" class="block animate-fade-in print:hidden">
                 <div class="bg-white p-6 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
                     <div class="flex items-center gap-4">
@@ -135,7 +204,7 @@
                         <select id="filter-prayer" onchange="window.renderInputTable()" class="bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 shadow-inner font-bold text-sm focus:ring-2 focus:ring-emerald-500 cursor-pointer w-full sm:w-auto">
                             <option value="all">Semua Waktu</option>
                             <option value="fardhu">Sholat 5 Waktu</option>
-                            <option value="sunnah">Sholat Malam</option>
+                            <option value="sunnah">Sholat Malam & Rawatib</option>
                         </select>
                         <input type="date" id="input-date" class="bg-gray-50 border border-gray-200 text-gray-900 rounded-xl p-3 shadow-inner font-bold text-sm focus:ring-2 focus:ring-emerald-500 cursor-pointer w-full sm:w-auto" onchange="window.renderInputTable()">
                     </div>
@@ -156,7 +225,7 @@
 
                 <div class="bg-white rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] overflow-hidden border border-gray-100" id="table-container">
                     <div class="overflow-auto max-h-[65vh]">
-                            <table class="w-full text-sm text-left text-gray-600">
+                        <table class="w-full text-sm text-left text-gray-600">
                             <thead class="bg-gray-50 text-[11px] uppercase text-gray-500 font-extrabold tracking-wider border-b border-gray-200">
                                 <tr id="input-thead-tr"></tr>
                             </thead>
@@ -175,6 +244,7 @@
                 </div>
             </section>
 
+            <!-- TAB LAPORAN -->
             <section id="section-report" class="hidden animate-fade-in">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center print:hidden">
                     <div class="flex items-center gap-4">
@@ -202,6 +272,7 @@
                 <div id="report-container"></div>
             </section>
 
+            <!-- TAB HUKUMAN -->
             <section id="section-punishment" class="hidden animate-fade-in">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center print:hidden">
                     <div class="flex items-center gap-4">
@@ -232,6 +303,7 @@
                 </div>
             </section>
 
+            <!-- TAB SANTRI -->
             <section id="section-students" class="hidden animate-fade-in print:hidden">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
                     <div class="bg-gray-100 text-gray-600 p-3 rounded-xl"><i class="fa-solid fa-users-gear text-xl"></i></div>
@@ -268,9 +340,27 @@
         </main>
     </div>
 
+    <!-- SCRIPT UTAMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        // --- DEKLARASI PENGATURAN DEFAULT ---
+        window.defaultSettings = {
+            targetTahajjud: 4,
+            targetWitir: 3,
+            targetRawatib: 12,
+            opsiFardhu: [
+                { id: 'J', label: 'Jamaah (J)', type: 'good' },
+                { id: 'TA', label: 'Telat Adzan (TA)', type: 'bad' },
+                { id: 'M', label: 'Masbuq (M)', type: 'bad' },
+                { id: 'UI', label: 'Uzur Izin (UI)', type: 'good' },
+                { id: 'UT', label: 'Tanpa Izin (UT)', type: 'bad' },
+                { id: 'S', label: 'Sakit (S)', type: 'good' }
+            ]
+        };
+        
+        window.appSettings = { ...window.defaultSettings };
 
         // --- DEKLARASI STATE (MEMORI LOKAL) ---
         window.students = [];
@@ -324,10 +414,12 @@
 
         window.switchTab = function(tab) {
             window.currentTab = tab;
-            const sections = ['input', 'report', 'punishment', 'students'];
+            const sections = ['input', 'report', 'punishment', 'students', 'settings'];
             sections.forEach(s => {
                 const sec = document.getElementById(`section-${s}`);
                 const btn = document.getElementById(`tab-${s}`);
+                if (!sec || !btn) return;
+                
                 if (s === tab) {
                     sec.classList.remove('hidden');
                     btn.className = 'flex-1 min-w-[130px] px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-sm border border-emerald-100';
@@ -340,37 +432,96 @@
             if(tab === 'report') window.renderReportTable();
             if(tab === 'punishment') window.renderPunishmentTable();
             if(tab === 'students') window.renderStudentsList();
+            if(tab === 'settings') window.renderSettings();
         }
+
+        // ================= SISTEM PENGATURAN (BARU) =================
+        window.renderSettings = function() {
+            document.getElementById('set-tahajjud').value = window.appSettings.targetTahajjud;
+            document.getElementById('set-witir').value = window.appSettings.targetWitir;
+            document.getElementById('set-rawatib').value = window.appSettings.targetRawatib || 12;
+
+            const listContainer = document.getElementById('settings-options-list');
+            listContainer.innerHTML = window.appSettings.opsiFardhu.map((opt, idx) => `
+                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="bg-gray-100 text-gray-600 font-bold text-xs px-2 py-1 rounded">${opt.id}</span>
+                        <span class="text-sm font-semibold text-gray-800">${opt.label}</span>
+                        ${opt.type === 'bad' ? '<span class="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded font-bold uppercase tracking-wider"><i class="fa-solid fa-gavel"></i> Hukuman</span>' : '<span class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-bold uppercase tracking-wider"><i class="fa-solid fa-check"></i> Aman</span>'}
+                    </div>
+                    <button onclick="window.deleteFardhuOption('${opt.id}')" class="text-red-400 hover:text-red-600 px-2 py-1 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `).join('');
+        }
+
+        window.addFardhuOption = function() {
+            const idInput = document.getElementById('new-opt-id').value.trim().toUpperCase();
+            const labelInput = document.getElementById('new-opt-label').value.trim();
+            const typeInput = document.getElementById('new-opt-type').value;
+
+            if(!idInput || !labelInput) return window.showToast('Kode dan Label harus diisi!', 'error');
+            if(window.appSettings.opsiFardhu.find(o => o.id === idInput)) return window.showToast('Kode sudah ada!', 'error');
+
+            window.appSettings.opsiFardhu.push({ id: idInput, label: labelInput, type: typeInput });
+            window.renderSettings();
+            
+            document.getElementById('new-opt-id').value = '';
+            document.getElementById('new-opt-label').value = '';
+        }
+
+        window.deleteFardhuOption = function(id) {
+            if(confirm('Yakin ingin menghapus opsi absen ini?')) {
+                window.appSettings.opsiFardhu = window.appSettings.opsiFardhu.filter(o => o.id !== id);
+                window.renderSettings();
+            }
+        }
+
+        window.saveSettings = function() {
+            window.appSettings.targetTahajjud = parseInt(document.getElementById('set-tahajjud').value) || 0;
+            window.appSettings.targetWitir = parseInt(document.getElementById('set-witir').value) || 0;
+            window.appSettings.targetRawatib = parseInt(document.getElementById('set-rawatib').value) || 0;
+
+            // Simpan ke Firebase (agar semua Ustadz dapat konfigurasi yang sama)
+            set(ref(window.database, 'settings'), window.appSettings).then(() => {
+                window.showToast('Pengaturan Berhasil Disimpan!');
+                // Re-render UI yang mungkin terdampak
+                window.renderInputTable();
+            });
+        }
+
+        // ================= HELPER & RENDER TABEL =================
 
         window.getStatusBadge = function(code) {
-            const badges = {
-                'TA': '<span class="text-yellow-600 font-bold">Telat Adzan</span>',
-                'M': '<span class="text-amber-600 font-bold">Masbuq</span>',
-                'UI': '<span class="text-blue-600 font-bold">Uzur Izin</span>',
-                'UT': '<span class="text-red-600 font-bold">Tanpa Izin</span>',
-                'S': '<span class="text-orange-600 font-bold">Sakit</span>'
-            };
-            return badges[code] || code;
+            if(!code) return '-';
+            const opt = window.appSettings.opsiFardhu.find(o => o.id === code);
+            if(opt) {
+                const colorClass = opt.type === 'bad' ? 'text-red-600' : 'text-blue-600';
+                return `<span class="${colorClass} font-bold">${opt.label}</span>`;
+            }
+            return code;
         }
 
-        window.createFardhuSelect = function(sId, prayer, val = 'J') {
+        window.createFardhuSelect = function(sId, prayer, val) {
+            // Default select pertama jika kosong
+            const currentVal = val || (window.appSettings.opsiFardhu.length > 0 ? window.appSettings.opsiFardhu[0].id : '');
+            
+            let optsHtml = window.appSettings.opsiFardhu.map(opt => {
+                const isBadClass = opt.type === 'bad' ? 'class="text-red-600 font-bold"' : '';
+                return `<option value="${opt.id}" ${currentVal === opt.id ? 'selected' : ''} ${isBadClass}>${opt.label}</option>`;
+            }).join('');
+            
             return `<select id="${sId}_${prayer}" class="bg-gray-50 border border-gray-200 text-gray-900 font-semibold text-xs rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 outline-none cursor-pointer hover:bg-gray-100 transition-colors">
-                <option value="J" ${val === 'J' ? 'selected' : ''}>Jamaah (J)</option>
-                <option value="TA" ${val === 'TA' ? 'selected' : ''}>Telat Adzan (TA)</option>
-                <option value="M" ${val === 'M' ? 'selected' : ''}>Masbuq (M)</option>
-                <option value="UI" ${val === 'UI' ? 'selected' : ''}>Uzur Izin (UI)</option>
-                <option value="UT" ${val === 'UT' ? 'selected' : ''} class="text-red-600 font-bold">Tanpa Izin (UT)</option>
-                <option value="S" ${val === 'S' ? 'selected' : ''} class="text-orange-500 font-bold">Sakit (S)</option>
+                ${optsHtml}
             </select>`;
         }
 
-        window.createSunnahSelect = function(sId, prayer, val = '0') {
-            let opts = `<option value="0" ${val === '0' ? 'selected' : ''}>0 Rakaat</option><option value="U" ${val === 'U' ? 'selected' : ''}>Uzur (U)</option>`;
-            for(let i=1; i<=12; i++) opts += `<option value="${i}" ${val == i ? 'selected' : ''}>${i} Rakaat</option>`;
-            return `<select id="${sId}_${prayer}" class="bg-emerald-50 border border-emerald-200 text-emerald-900 font-semibold text-xs rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 outline-none cursor-pointer hover:bg-emerald-100 transition-colors min-w-[100px]">${opts}</select>`;
+        window.createSunnahSelect = function(sId, prayer, val = '0', maxRk = 12) {
+            let opts = `<option value="0" ${val === '0' ? 'selected' : ''}>0 Rk</option><option value="U" ${val === 'U' ? 'selected' : ''}>Uzur</option>`;
+            for(let i=1; i<=maxRk; i++) opts += `<option value="${i}" ${val == i ? 'selected' : ''}>${i} Rk</option>`;
+            return `<select id="${sId}_${prayer}" class="bg-emerald-50 border border-emerald-200 text-emerald-900 font-semibold text-xs rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 outline-none cursor-pointer hover:bg-emerald-100 transition-colors min-w-[70px]">${opts}</select>`;
         }
 
-        // --- FUNGSI MANIPULASI DATA ---
+        // --- FUNGSI MANIPULASI DATA SANTRI ---
         window.renderStudentsList = function() {
             const tbody = document.getElementById('students-tbody');
             if (window.students.length === 0) {
@@ -418,7 +569,6 @@
             }
         }
 
-        // SISTEM SOFT DELETE (ARSIP)
         window.archiveStudent = function(id) {
             const student = window.students.find(s => s.id === id);
             const isCurrentlyActive = (student.status !== 'nonaktif');
@@ -433,7 +583,6 @@
             }
         }
 
-        // SISTEM HARD DELETE (HAPUS PERMANEN)
         window.deleteStudent = function(id) {
             if(confirm('BAHAYA: Yakin ingin HAPUS PERMANEN?\n\nData laporan bulan lalu milik anak ini akan ikut terhapus dan rusak. \n\n(Disarankan pakai tombol kuning "Arsip" saja jika anak ini keluar/lulus)')) {
                 const filteredArray = window.students.filter(s => s.id !== id);
@@ -460,14 +609,16 @@
 
             if(activeStudents.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-gray-500 italic">Belum ada daftar santri aktif di Database.</td></tr>`; theadTr.innerHTML=''; return; }
 
+            // ALL PRAYERS DINAMIS DENGAN RAWATIB
             const allPrayers = [
                 { id: 'subuh', label: 'Subuh', type: 'fardhu' },
                 { id: 'dzuhur', label: 'Dzuhur', type: 'fardhu' },
                 { id: 'ashar', label: 'Ashar', type: 'fardhu' },
                 { id: 'maghrib', label: 'Maghrib', type: 'fardhu' },
                 { id: 'isya', label: 'Isya', type: 'fardhu' },
-                { id: 'tahajjud', label: 'Tahajjud <br><span class="text-[9px] font-semibold normal-case text-blue-500">(Min. 4 Rk)</span>', type: 'sunnah', bg: 'bg-blue-50/50 text-blue-800 border-l border-blue-100' },
-                { id: 'witir', label: 'Witir <br><span class="text-[9px] font-semibold normal-case text-blue-500">(Min. 3 Rk)</span>', type: 'sunnah', bg: 'bg-blue-50/50 text-blue-800 border-l border-blue-100' }
+                { id: 'tahajjud', label: `Tahajjud <br><span class="text-[9px] font-semibold normal-case text-blue-500">(Min. ${window.appSettings.targetTahajjud} Rk)</span>`, type: 'sunnah', bg: 'bg-blue-50/50 text-blue-800 border-l border-blue-100', max: 12 },
+                { id: 'witir', label: `Witir <br><span class="text-[9px] font-semibold normal-case text-blue-500">(Min. ${window.appSettings.targetWitir} Rk)</span>`, type: 'sunnah', bg: 'bg-blue-50/50 text-blue-800 border-l border-blue-100', max: 11 },
+                { id: 'rawatib', label: `Rawatib <br><span class="text-[9px] font-semibold normal-case text-blue-500">(Min. ${window.appSettings.targetRawatib} Rk)</span>`, type: 'sunnah', bg: 'bg-blue-50/50 text-blue-800 border-l border-blue-100', max: 12 }
             ];
 
             let activePrayers = allPrayers;
@@ -477,12 +628,10 @@
                 activePrayers = allPrayers.filter(p => p.type === 'sunnah');
             }
 
-                        // Z-40 untuk pojok kiri atas, Z-30 untuk baris atas
             let headerHtml = `<th class="px-5 py-4 sticky-col bg-gray-50 min-w-[140px] sticky top-0 z-40 shadow-sm border-b border-gray-200">Nama Lengkap</th>`;
             activePrayers.forEach(p => {
-                // Hapus efek transparan (/50) agar teks di bawahnya tertutup sempurna saat di-scroll
                 const bgSolid = (p.bg || 'border-l border-gray-200 bg-gray-50').replace('/50', ''); 
-                headerHtml += `<th class="px-3 py-4 text-center min-w-[110px] ${bgSolid} sticky top-0 z-30 shadow-sm border-b border-gray-200">${p.label}</th>`;
+                headerHtml += `<th class="px-3 py-4 text-center min-w-[90px] ${bgSolid} sticky top-0 z-30 shadow-sm border-b border-gray-200">${p.label}</th>`;
             });
 
             theadTr.innerHTML = headerHtml;
@@ -498,7 +647,7 @@
                     if (p.type === 'fardhu') {
                         rowHtml += `<td class="px-2 py-2 border-l border-gray-100">${window.createFardhuSelect(s.id, p.id, d[p.id])}</td>`;
                     } else {
-                        rowHtml += `<td class="px-2 py-2 border-l border-blue-50 bg-blue-50/30">${window.createSunnahSelect(s.id, p.id, d[p.id])}</td>`;
+                        rowHtml += `<td class="px-2 py-2 border-l border-blue-50 bg-blue-50/30">${window.createSunnahSelect(s.id, p.id, d[p.id], p.max)}</td>`;
                     }
                 });
                 
@@ -518,7 +667,7 @@
             window.students.forEach(s => {
                 newDayData[s.id] = existingDayData[s.id] ? { ...existingDayData[s.id] } : {};
                 
-                ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya', 'tahajjud', 'witir'].forEach(sholat => {
+                ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya', 'tahajjud', 'witir', 'rawatib'].forEach(sholat => {
                     const selectEl = document.getElementById(`${s.id}_${sholat}`);
                     if (selectEl) {
                         newDayData[s.id][sholat] = selectEl.value;
@@ -566,19 +715,20 @@
             const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
             const tableHeaderHTML = `
-                <thead class="text-[8px] text-gray-500 uppercase bg-gray-50 border-b border-gray-200 font-extrabold tracking-wider">
+                <thead class="text-[8px] text-gray-700 uppercase bg-gray-100 border-b border-gray-300 font-extrabold tracking-tight">
                     <tr>
-                        <th class="px-5 py-3 min-w-[100px] sticky-col bg-gray-50" rowspan="2">Nama Santri</th>
-                        <th class="px-2 py-3 text-center border-l bg-emerald-50/50 text-emerald-800" rowspan="2">Disiplin<br>Fardhu</th>
-                        <th class="px-2 py-2 text-center border-l border-b" colspan="5">Kehadiran Fardhu (Jamaah, Telat Adzan, Masbuq)</th>
-                        <th class="px-4 py-3 text-left border-l bg-red-50/30 text-red-800" rowspan="2">Catatan Pelanggaran Fardhu<br><span class="text-[8px] font-medium text-gray-500 normal-case">(Telat Adzan, Masbuq, Uzur, Sakit)</span></th>
-                        <th class="px-2 py-3 text-center border-l bg-blue-50/50 text-blue-800" rowspan="2">Disiplin<br>Sunnah</th>
-                        <th class="px-2 py-2 text-center border-l border-b" colspan="2">Target Sunnah Hari</th>
-                        <th class="px-2 py-2 text-center border-l border-b" colspan="2">Rakaat Sunnah</th>
+                        <th class="px-2 py-2 w-[14%]" rowspan="2">Nama Santri</th>
+                        <th class="px-1 py-2 text-center border-l w-[4%]" rowspan="2">% Fardhu</th>
+                        <th class="px-1 py-1 text-center border-l border-b w-[18%]" colspan="5">Hadir Fardhu</th>
+                        <th class="px-2 py-2 text-left border-l w-[24%]" rowspan="2">Catatan Pelanggaran Fardhu</th>
+                        <th class="px-1 py-2 text-center border-l w-[4%]" rowspan="2">% Sunnah</th>
+                        <th class="px-1 py-1 text-center border-l border-b w-[18%]" colspan="3">Target Sunnah Hari</th>
+                        <th class="px-1 py-1 text-center border-l border-b w-[18%]" colspan="3">Total Rakaat</th>
                     </tr>
                     <tr>
-                        <th class="px-1 py-1.5 text-center border-l">Subuh</th><th class="px-1 py-1.5 text-center border-l">Dzuhur</th><th class="px-1 py-1.5 text-center border-l">Ashar</th><th class="px-1 py-1.5 text-center border-l">Maghrib</th><th class="px-1 py-1.5 text-center border-l">Isya</th>
-                        <th class="px-1 py-1.5 text-center border-l">Tahajjud (≥4)</th><th class="px-1 py-1.5 text-center border-l">Witir (≥3)</th><th class="px-1 py-1.5 text-center border-l text-gray-400 font-medium">Tahajjud</th><th class="px-1 py-1.5 text-center border-l text-gray-400 font-medium">Witir</th>
+                        <th class="px-1 py-1 text-center border-l text-[7px]">S</th><th class="px-1 py-1 text-center border-l text-[7px]">D</th><th class="px-1 py-1 text-center border-l text-[7px]">A</th><th class="px-1 py-1 text-center border-l text-[7px]">M</th><th class="px-1 py-1 text-center border-l text-[7px]">I</th>
+                        <th class="px-1 py-1 text-center border-l text-[7px]">Thj</th><th class="px-1 py-1 text-center border-l text-[7px]">Wtr</th><th class="px-1 py-1 text-center border-l text-[7px]">Rwb</th>
+                        <th class="px-1 py-1 text-center border-l text-[7px]">Thj</th><th class="px-1 py-1 text-center border-l text-[7px]">Wtr</th><th class="px-1 py-1 text-center border-l text-[7px]">Rwb</th>
                     </tr>
                 </thead>`;
 
@@ -590,12 +740,12 @@
                 allHtml += `<div class="mb-10 page-break-avoid"><h3 class="text-base font-extrabold text-gray-800 mb-4 border-l-4 border-emerald-500 pl-3 flex items-center gap-2">${w.name} <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-lg">${w.desc}</span>${totalDaysRecorded === 0 ? '<span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold shadow-sm ml-2">DATA KOSONG / LIBUR</span>' : ''}</h3><div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-700">${tableHeaderHTML}<tbody>`;
 
                 if(totalDaysRecorded === 0) {
-                     allHtml += `<tr><td colspan="13" class="text-center py-8 text-gray-400 font-medium">Belum ada input data di pekan ini.</td></tr>`;
+                     allHtml += `<tr><td colspan="15" class="text-center py-8 text-gray-400 font-medium">Belum ada input data di pekan ini.</td></tr>`;
                 } else {
                     let hasRenderedAnyone = false;
                     window.students.forEach((s, idx) => {
                         let fTotal = 0, fHari = { subuh: 0, dzuhur: 0, ashar: 0, maghrib: 0, isya: 0 };
-                        let tHari = 0, wHari = 0, tRk = 0, wRk = 0, catatanLog = []; 
+                        let tHari = 0, wHari = 0, rHari = 0, tRk = 0, wRk = 0, rRk = 0, catatanLog = []; 
                         let hasDataThisWeek = false;
 
                         weekKeys.forEach(date => {
@@ -605,15 +755,27 @@
                                 let anomaly = [];
                                 ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].forEach(f => {
                                     const val = sData[f];
-                                    if(val === 'J' || val === 'TA' || val === 'M') { fTotal++; fHari[f]++; }
-                                    if(val !== 'J' && val !== undefined) anomaly.push(`<span class="font-semibold text-gray-600">${sholatLabel[f]}:</span> ${window.getStatusBadge(val)}`);
+                                    
+                                    // Cek apakah diabsen (bukan kosong/undefined)
+                                    if(val) {
+                                        // Cari data opsi dari Pengaturan
+                                        const opt = window.appSettings.opsiFardhu.find(o => o.id === val);
+                                        // Jika opsi 'good' (Aman, seperti Jamaah, Uzur) maka hitung hadir
+                                        if(opt && opt.type === 'good') { fTotal++; fHari[f]++; }
+                                        // Catat sbg anomali jika bukan opsi pertama (biasanya opsi pertama adalah 'J' Jamaah)
+                                        if(opt && opt.id !== window.appSettings.opsiFardhu[0].id) {
+                                            anomaly.push(`<span class="font-semibold text-gray-600">${sholatLabel[f]}:</span> ${window.getStatusBadge(val)}`);
+                                        }
+                                    }
                                 });
                                 if (anomaly.length > 0) {
                                     const dObj = new Date(date);
                                     catatanLog.push(`<div class="mb-1.5"><span class="font-bold text-gray-800 text-[10px] mr-1">${namaHari[dObj.getDay()]}, ${dObj.getDate()}</span> ${anomaly.join(' <span class="text-gray-300">|</span> ')}</div>`);
                                 }
-                                const thj = sData.tahajjud; if(thj === 'U'){ tHari++; } else { const r=parseInt(thj)||0; tRk+=r; if(r>=4) tHari++; }
-                                const wtr = sData.witir; if(wtr === 'U'){ wHari++; } else { const r=parseInt(wtr)||0; wRk+=r; if(r>=3) wHari++; }
+                                
+                                const thj = sData.tahajjud; if(thj === 'U'){ tHari++; } else { const r=parseInt(thj)||0; tRk+=r; if(r>=window.appSettings.targetTahajjud) tHari++; }
+                                const wtr = sData.witir; if(wtr === 'U'){ wHari++; } else { const r=parseInt(wtr)||0; wRk+=r; if(r>=window.appSettings.targetWitir) wHari++; }
+                                const rwb = sData.rawatib; if(rwb === 'U'){ rHari++; } else { const r=parseInt(rwb)||0; rRk+=r; if(r>=window.appSettings.targetRawatib) rHari++; }
                             }
                         });
 
@@ -633,7 +795,7 @@
                         hasRenderedAnyone = true;
 
                         const pctF = totalDaysRecorded === 0 ? 0 : Math.round((fTotal / (5*totalDaysRecorded)) * 100);
-                        const pctS = totalDaysRecorded === 0 ? 0 : Math.round(((tHari+wHari) / (2*totalDaysRecorded)) * 100);
+                        const pctS = totalDaysRecorded === 0 ? 0 : Math.round(((tHari+wHari+rHari) / (3*totalDaysRecorded)) * 100);
                         const colorF = pctF < 70 ? 'text-red-600 bg-red-50' : 'text-emerald-700 bg-emerald-50/50';
                         const colorS = pctS < 50 ? 'text-red-600 bg-red-50' : 'text-blue-700 bg-blue-50/50';
                         const bgRow = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
@@ -652,20 +814,22 @@
 <td class="px-1 py-2 text-center border-l font-extrabold text-[9px] ${colorS}">${pctS}%</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${tHari}/${totalDaysRecorded}</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${wHari}/${totalDaysRecorded}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-600">${rHari}/${totalDaysRecorded}</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-400 font-bold">${tRk}</td>
 <td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-400 font-bold">${wRk}</td>
+<td class="px-1 py-2 text-center border-l font-mono text-[8px] text-gray-400 font-bold">${rRk}</td>
 </tr>`;
                     });
 
                     if(!hasRenderedAnyone) {
-                         allHtml += `<tr><td colspan="13" class="text-center py-8 text-gray-400 font-medium">Tidak ada data santri yang relevan di pekan ini.</td></tr>`;
+                         allHtml += `<tr><td colspan="15" class="text-center py-8 text-gray-400 font-medium">Tidak ada data santri yang relevan di pekan ini.</td></tr>`;
                     }
                 }
                 allHtml += `</tbody></table></div></div></div>`;
             });
             container.innerHTML = allHtml;
         }
-
+                  // Fungsi untuk Auto-Save Tab Hukuman ke Cloud
         window.savePunishment = function(id, field, value) {
             if (!window.dbPunishment[id]) window.dbPunishment[id] = {};
             window.dbPunishment[id][field] = value;
@@ -707,15 +871,28 @@
                     const sData = (window.db && window.db[date]) ? window.db[date][s.id] : undefined;
                     if(sData) {
                         let violations = [];
+                        
+                        // Cek Pelanggaran Fardhu Dinamis berdasarkan Pengaturan
                         ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'].forEach(f => {
-                            if(sData[f] === 'TA') violations.push(`<li><span class="font-bold text-gray-700">${sholatLabel[f]}:</span> <span class="text-yellow-600 font-bold">Telat Adzan</span></li>`);
-                            if(sData[f] === 'M') violations.push(`<li><span class="font-bold text-gray-700">${sholatLabel[f]}:</span> <span class="text-amber-600 font-bold">Masbuq</span></li>`);
-                            if(sData[f] === 'UT') violations.push(`<li><span class="font-bold text-gray-700">${sholatLabel[f]}:</span> <span class="text-red-600 font-bold">Tanpa Izin</span></li>`);
+                            const val = sData[f];
+                            if(val) {
+                                const opt = window.appSettings.opsiFardhu.find(o => o.id === val);
+                                if(opt && opt.type === 'bad') {
+                                    violations.push(`<li><span class="font-bold text-gray-700">${sholatLabel[f]}:</span> <span class="text-red-600 font-bold">${opt.label}</span></li>`);
+                                }
+                            }
                         });
+                        
+                        // Cek Pelanggaran Sunnah Dinamis
                         const thj = parseInt(sData.tahajjud)||0;
-                        if(sData.tahajjud !== 'U' && thj < 4) violations.push(`<li><span class="font-bold text-blue-800">Tahajjud:</span> <span class="text-blue-600 font-bold">Kurang Target (${thj} Rakaat)</span></li>`);
+                        if(sData.tahajjud !== 'U' && thj < window.appSettings.targetTahajjud) violations.push(`<li><span class="font-bold text-blue-800">Tahajjud:</span> <span class="text-blue-600 font-bold">Kurang Target (${thj} Rakaat)</span></li>`);
+                        
                         const wtr = parseInt(sData.witir)||0;
-                        if(sData.witir !== 'U' && wtr < 3) violations.push(`<li><span class="font-bold text-blue-800">Witir:</span> <span class="text-blue-600 font-bold">Kurang Target (${wtr} Rakaat)</span></li>`);
+                        if(sData.witir !== 'U' && wtr < window.appSettings.targetWitir) violations.push(`<li><span class="font-bold text-blue-800">Witir:</span> <span class="text-blue-600 font-bold">Kurang Target (${wtr} Rakaat)</span></li>`);
+
+                        const rwb = parseInt(sData.rawatib)||0;
+                        if(sData.rawatib !== 'U' && rwb < window.appSettings.targetRawatib) violations.push(`<li><span class="font-bold text-blue-800">Rawatib:</span> <span class="text-blue-600 font-bold">Kurang Target (${rwb} Rakaat)</span></li>`);
+
 
                         if(violations.length > 0) {
                             dayHasViolation = true; totalMonthlyViolations++;
@@ -782,6 +959,27 @@
         window.database = getDatabase(app);
 
         // ================= 3. INISIALISASI LISTENER FIREBASE =================
+        
+        // Listener Khusus Pengaturan
+        onValue(ref(window.database, 'settings'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Merge data firebase dengan default untuk menghindari crash jika ada key baru
+                window.appSettings = { ...window.defaultSettings, ...data };
+                // Validasi data array opsi fardhu jika rusak
+                if(!window.appSettings.opsiFardhu || window.appSettings.opsiFardhu.length === 0) {
+                    window.appSettings.opsiFardhu = window.defaultSettings.opsiFardhu;
+                }
+            } else {
+                window.appSettings = { ...window.defaultSettings };
+            }
+            
+            if(window.currentTab === 'settings') window.renderSettings();
+            if(window.currentTab === 'input') window.renderInputTable();
+            if(window.currentTab === 'report') window.renderReportTable();
+            if(window.currentTab === 'punishment') window.renderPunishmentTable();
+        });
+
         onValue(ref(window.database, 'students'), (snapshot) => {
             const data = snapshot.val();
             if (data) {
